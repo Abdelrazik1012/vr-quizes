@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>VR Mastery Quiz: 86 Questions on Virtual Reality</title>
+    <title>VR Exam: 118 Questions (MCQs + True/False)</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .quiz-container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             background: rgba(18, 22, 35, 0.85);
             backdrop-filter: blur(2px);
@@ -201,6 +201,15 @@
             border-top: 1px solid #20273d;
         }
 
+        .badge-tf {
+            background: #2d3748;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+
         @media (max-width: 700px) {
             .quiz-questions {
                 padding: 1rem;
@@ -218,12 +227,12 @@
 <body>
 <div class="quiz-container">
     <div class="quiz-header">
-        <h1>🧠 Virtual Reality Mastery</h1>
-        <p>86 essential MCQs — from fundamentals, history, hardware, UX, to future trends</p>
+        <h1>🧠 Virtual Reality Mastery <span style="font-size:1rem;">(118 questions)</span></h1>
+        <p>86 MCQs + 32 True/False — from fundamentals, hardware, UX, ethics, and future trends</p>
     </div>
     <div class="stats-bar">
-        <div class="progress-text">📋 Questions: <span id="totalCounter">0</span> answered out of 86</div>
-        <div class="score-area">🏆 Score: <span id="scoreDisplay">0</span> / 86</div>
+        <div class="progress-text">📋 Answered: <span id="totalCounter">0</span> / 118</div>
+        <div class="score-area">🏆 Score: <span id="scoreDisplay">0</span> / 118</div>
         <div style="display: flex; gap: 12px;">
             <button class="submit-btn" id="submitQuiz">✅ Submit & Grade</button>
             <button class="reset-btn" id="resetQuiz">⟳ Reset Answers</button>
@@ -231,15 +240,14 @@
     </div>
     <div id="questionsContainer" class="quiz-questions"></div>
     <div id="resultMessage" class="result-area" style="display: none;"></div>
-    <footer>VR / XR knowledge check — each question has one correct answer. Good luck!</footer>
+    <footer>VR / XR comprehensive exam — each question has one correct answer. Good luck!</footer>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // 86 MCQs extracted from the provided file (all answers verified)
-    // Structure: { text, options: [a,b,c,d], correct: 'a'|'b'|'c'|'d' }
+    // PART 1: 86 MCQs (from original VR file)
     // --------------------------------------------------------------
-    const QUESTIONS_DATA = [
+    const MCQS = [
         { text: "Virtual Reality creates environments that are:", options: ["Only text-based", "Immersive and computer-generated", "Physical models", "Purely audio-based"], correct: "b" },
         { text: "Which core concept refers to 'Complete sensory engagement in a virtual environment'?", options: ["Interaction", "Presence", "Immersion", "Latency"], correct: "c" },
         { text: "'Presence' in VR is defined as:", options: ["The cost of the hardware", "The feeling of actually being in the virtual space", "The ability to touch physical objects", "The speed of the internet connection"], correct: "b" },
@@ -277,7 +285,7 @@
         { text: "Which phase involves translating requirements into storylines and user experience planning?", options: ["Discovery Phase", "Design Phase", "Development Phase", "Testing Phase"], correct: "b" },
         { text: "Unity and Unreal Engine are categorized as:", options: ["SDKs", "3D Modeling Software", "Game Engines", "VR Runtimes"], correct: "c" },
         { text: "To optimize GPU fill rate, it is recommended to:", options: ["Increase resolution", "Enable HDR buffers", "Decrease or disable MSAA", "Use ray tracing"], correct: "c" },
-        { text: "Which diagnostic tool is used specifically for graphics analysis?", options: ["Performance HUD", "GAPID", "Unity Profiler", "RenderDoc (implied from context)"], correct: "b" },
+        { text: "Which diagnostic tool is used specifically for graphics analysis?", options: ["Performance HUD", "GAPID", "Unity Profiler", "RenderDoc"], correct: "b" },
         { text: "What is the recommended limit for draw calls per eye in VR?", options: ["10-20", "50-100", "200-500", "1000+"], correct: "b" },
         { text: "Which 3D modeling software is mentioned in the tools list?", options: ["Blender", "Photoshop", "OpenVR", "Maya"], correct: "a" },
         { text: "Moving operations to the vertex shader is a strategy for:", options: ["Texture Optimization", "Shader Optimization", "Audio Optimization", "Physics Optimization"], correct: "b" },
@@ -328,28 +336,71 @@
         { text: "The future trend in VR that involves using remote servers to process VR experiences and stream them to headsets is called ______ VR.", options: ["Standalone", "Tethered", "Cloud", "Edge"], correct: "c" }
     ];
 
-    // Validate: we have exactly 86 questions
-    console.log("Total questions loaded:", QUESTIONS_DATA.length);
+    // --------------------------------------------------------------
+    // PART 2: 32 True / False Questions (from the provided PDF)
+    // --------------------------------------------------------------
+    const TRUE_FALSE = [
+        { text: "Decreasing draw calls is a recommended performance tip for VR development.", options: ["True", "False"], correct: "a" },
+        { text: "Effective optimization can improve performance from 5 FPS to 90 FPS.", options: ["True", "False"], correct: "a" },
+        { text: "Advanced eye tracking will likely decrease the accuracy of foveated rendering in the future.", options: ["True", "False"], correct: "b" },
+        { text: "30 FPS is the minimum requirement for a comfortable VR experience.", options: ["True", "False"], correct: "b" },
+        { text: "Motion-to-photon delay is irrelevant to a user's VR experience.", options: ["True", "False"], correct: "b" },
+        { text: "SLAM algorithms are used to estimate the position of a headset in its environment.", options: ["True", "False"], correct: "a" },
+        { text: "The Quest 2 cannot be connected to a PC.", options: ["True", "False"], correct: "b" },
+        { text: "Adjustable IPD helps ensure a clearer image for the user.", options: ["True", "False"], correct: "a" },
+        { text: "Gloves and haptic systems are considered VR input devices.", options: ["True", "False"], correct: "a" },
+        { text: "An SDK is a development tool used for creating VR applications.", options: ["True", "False"], correct: "a" },
+        { text: "Interaction Design (IxD) focuses on the holistic relationship between the user and the product, including non-interactive aspects.", options: ["True", "False"], correct: "b" },
+        { text: "Don Norman's principle of 'Feedback' involves letting the user know what action has been taken and what has been accomplished.", options: ["True", "False"], correct: "a" },
+        { text: "A 'hamburger menu' is an example of high visibility compared to a tab-bar menu.", options: ["True", "False"], correct: "b" },
+        { text: "Consistency in design helps build user confidence by creating predictability.", options: ["True", "False"], correct: "a" },
+        { text: "UX Design is considered a subset of Interaction Design.", options: ["True", "False"], correct: "b" },
+        { text: "'Affordance' refers to the attributes of an object that allow people to know how to use it.", options: ["True", "False"], correct: "a" },
+        { text: "VR Development only involves coding for user interaction and does not include 3D environment design.", options: ["True", "False"], correct: "b" },
+        { text: "The Discovery Phase is where you identify target behaviors and set learning objectives.", options: ["True", "False"], correct: "a" },
+        { text: "OpenVR and Oculus SDK are examples of Software Development Kits (SDKs).", options: ["True", "False"], correct: "a" },
+        { text: "Performance testing on a desktop emulator is sufficient to reveal mobile-specific bottlenecks.", options: ["True", "False"], correct: "b" },
+        { text: "The 'Technical Review' in the platform submission process verifies if the app meets minimum technical standards.", options: ["True", "False"], correct: "a" },
+        { text: "The Global VR Market is expected to reach $22 Billion by the year 2025.", options: ["True", "False"], correct: "a" },
+        { text: "VR Exposure Therapy is an ineffective method for treating PTSD and anxiety disorders.", options: ["True", "False"], correct: "b" },
+        { text: "Medical training using VR can result in a 63% increase in knowledge retention.", options: ["True", "False"], correct: "a" },
+        { text: "VR in the automotive industry actually increases the need for physical prototypes.", options: ["True", "False"], correct: "b" },
+        { text: "According to the notes, VR training programs have a user engagement rate of 84%.", options: ["True", "False"], correct: "a" },
+        { text: "VR systems can track unique user movements, which raises significant privacy and data ownership concerns.", options: ["True", "False"], correct: "a" },
+        { text: "There is currently no risk of psychological impact, such as emotional manipulation, when using VR.", options: ["True", "False"], correct: "b" },
+        { text: "Approximately 61% of Americans have expressed a strong interest in owning a VR headset.", options: ["True", "False"], correct: "b" },
+        { text: "High cost is a barrier for developers, with app development costs ranging from $30K to $150K.", options: ["True", "False"], correct: "a" },
+        { text: "'Latency Issues' refer to the delay between signals that can negatively affect the user experience.", options: ["True", "False"], correct: "a" },
+        { text: "VR technology is currently evolving beyond gaming into enterprise applications across various industries.", options: ["True", "False"], correct: "a" }
+    ];
 
-    let userAnswers = new Array(86).fill(null);
+    // Combine all questions: MCQs first, then True/False
+    const ALL_QUESTIONS = [...MCQS, ...TRUE_FALSE];
+    const TOTAL_QS = ALL_QUESTIONS.length;  // = 118
+
+    let userAnswers = new Array(TOTAL_QS).fill(null);
     let quizSubmitted = false;
 
     function renderQuestions() {
         const container = document.getElementById('questionsContainer');
         container.innerHTML = '';
-        QUESTIONS_DATA.forEach((q, idx) => {
+        ALL_QUESTIONS.forEach((q, idx) => {
             const qNumber = idx + 1;
             const card = document.createElement('div');
             card.className = 'question-card';
             card.setAttribute('data-qid', idx);
+            
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
-            questionText.innerHTML = `<span style="background:#2d3a5e; padding:2px 12px; border-radius:40px; margin-right:12px;">${qNumber}</span> ${q.text}`;
+            let typeBadge = '';
+            if (idx >= MCQS.length) typeBadge = '<span class="badge-tf">True/False</span>';
+            questionText.innerHTML = `<span style="background:#2d3a5e; padding:2px 12px; border-radius:40px; margin-right:12px;">${qNumber}</span> ${q.text} ${typeBadge}`;
             card.appendChild(questionText);
 
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'options';
             const letters = ['a', 'b', 'c', 'd'];
+            // for T/F only first two matter but we use options array
             q.options.forEach((opt, optIdx) => {
                 const letter = letters[optIdx];
                 const optionWrapper = document.createElement('label');
@@ -364,7 +415,6 @@
                         userAnswers[idx] = e.target.value;
                         updateStats();
                     } else {
-                        // If quiz submitted, prevent changes or optionally re-enable? better to block changes after grading
                         e.target.checked = false;
                         alert("Quiz already submitted. Press 'Reset Answers' to try again.");
                     }
@@ -377,6 +427,7 @@
                 optionsDiv.appendChild(optionWrapper);
             });
             card.appendChild(optionsDiv);
+
             if (quizSubmitted && userAnswers[idx]) {
                 const isCorrect = (userAnswers[idx] === q.correct);
                 if (isCorrect) card.classList.add('correct-highlight');
@@ -389,7 +440,8 @@
                     feedbackSpan.innerHTML = '✅ Correct';
                     feedbackSpan.style.color = '#86efac';
                 } else {
-                    feedbackSpan.innerHTML = `❌ Incorrect. Correct answer: ${q.correct.toUpperCase()}) ${q.options[letters.indexOf(q.correct)]}`;
+                    let correctAnswerText = q.options[letters.indexOf(q.correct)];
+                    feedbackSpan.innerHTML = `❌ Incorrect. Correct answer: ${q.correct.toUpperCase()}) ${correctAnswerText}`;
                     feedbackSpan.style.color = '#fbbf24';
                 }
                 card.appendChild(feedbackSpan);
@@ -405,8 +457,8 @@
             document.getElementById('scoreDisplay').innerText = '?';
         } else {
             let correctCount = 0;
-            for (let i = 0; i < QUESTIONS_DATA.length; i++) {
-                if (userAnswers[i] && userAnswers[i] === QUESTIONS_DATA[i].correct) correctCount++;
+            for (let i = 0; i < TOTAL_QS; i++) {
+                if (userAnswers[i] && userAnswers[i] === ALL_QUESTIONS[i].correct) correctCount++;
             }
             document.getElementById('scoreDisplay').innerText = `${correctCount}`;
         }
@@ -418,29 +470,29 @@
             return;
         }
         let answeredCount = userAnswers.filter(a => a !== null).length;
-        if (answeredCount < 86) {
-            if (!confirm(`You have answered ${answeredCount} out of 86 questions. Submit anyway? Unanswered will count as wrong.`)) {
+        if (answeredCount < TOTAL_QS) {
+            if (!confirm(`You have answered ${answeredCount} out of ${TOTAL_QS} questions. Submit anyway? Unanswered will count as wrong.`)) {
                 return;
             }
         }
         let correctTotal = 0;
-        for (let i = 0; i < QUESTIONS_DATA.length; i++) {
-            if (userAnswers[i] && userAnswers[i] === QUESTIONS_DATA[i].correct) correctTotal++;
+        for (let i = 0; i < TOTAL_QS; i++) {
+            if (userAnswers[i] && userAnswers[i] === ALL_QUESTIONS[i].correct) correctTotal++;
         }
         quizSubmitted = true;
         document.getElementById('scoreDisplay').innerText = `${correctTotal}`;
-        const percent = ((correctTotal / 86) * 100).toFixed(1);
+        const percent = ((correctTotal / TOTAL_QS) * 100).toFixed(1);
         const msgDiv = document.getElementById('resultMessage');
         msgDiv.style.display = 'block';
-        msgDiv.innerHTML = `<strong>🏆 Final Score: ${correctTotal} / 86 (${percent}%)</strong><br> 
+        msgDiv.innerHTML = `<strong>🏆 Final Score: ${correctTotal} / ${TOTAL_QS} (${percent}%)</strong><br> 
         ${percent >= 70 ? '🌟 Excellent VR knowledge! 🌟' : percent >= 50 ? '📚 Good attempt, review the topics for mastery.' : '🎓 Keep studying — virtual reality concepts take practice!'}
         <br> <span style="font-size:0.85rem;">✅ Green cards = correct &nbsp;&nbsp; 🟠 Orange cards = incorrect (correct answer shown)</span>`;
-        renderQuestions();  // re-render with highlight & correct answers
+        renderQuestions();  // re-render with highlights & correct answers
         updateStats();
     }
 
     function resetQuiz() {
-        userAnswers = new Array(86).fill(null);
+        userAnswers = new Array(TOTAL_QS).fill(null);
         quizSubmitted = false;
         document.getElementById('resultMessage').style.display = 'none';
         document.getElementById('scoreDisplay').innerText = '0';
