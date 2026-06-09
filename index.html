@@ -3,249 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>VR Exam: 118 Questions (MCQs + True/False)</title>
+    <title>⚡ DEEP HACK VR QUIZ ⚡</title>
     <style>
+        /* ========== MATRIX RAIN CANVAS BACKGROUND ========== */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: black;
+        }
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        /* GLITCH & CRT EFFECTS */
+        @keyframes glitch {
+            0% { text-shadow: -2px 0 #0f0, 2px 0 #0f0; opacity: 0.9; }
+            2% { text-shadow: 2px 0 #0f0, -2px 0 #0f0; }
+            4% { text-shadow: 0 0 5px #0f0; }
+            100% { text-shadow: 0 0 3px #0f0; }
+        }
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        @keyframes flicker {
+            0% { opacity: 0.8; text-shadow: 0 0 2px #0f0; }
+            50% { opacity: 1; text-shadow: 0 0 12px #0f0, 0 0 4px #0f0; }
+            100% { opacity: 0.8; text-shadow: 0 0 2px #0f0; }
+        }
+        @keyframes attackFlash {
+            0% { background: rgba(0, 255, 0, 0); }
+            20% { background: rgba(0, 255, 0, 0.4); }
+            100% { background: rgba(0, 255, 0, 0); }
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            background: linear-gradient(145deg, #10121c 0%, #1a1f2f 100%);
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            padding: 2rem 1rem;
-            color: #eef2ff;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            background: #000000;
+            color: #0f0;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
         }
-
-        .quiz-container {
+        /* scanline overlay */
+        .scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 0px, rgba(0, 255, 0, 0.03) 2px, transparent 2px, transparent 6px);
+            pointer-events: none;
+            z-index: 5;
+        }
+        .quiz-wrapper {
             max-width: 1100px;
             margin: 0 auto;
-            background: rgba(18, 22, 35, 0.85);
-            backdrop-filter: blur(2px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 10, 0, 0.75);
+            backdrop-filter: blur(4px);
+            border: 1px solid #2eff7a;
+            border-radius: 24px;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
             overflow: hidden;
-            border: 1px solid rgba(72, 187, 255, 0.2);
         }
-
         .quiz-header {
-            background: #0b0e18;
-            padding: 1.8rem 2rem;
-            border-bottom: 1px solid #2d3748;
+            background: #030b03;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #0f0;
+            text-align: center;
         }
-
         .quiz-header h1 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #c0e0ff, #7aa9ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.3px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 8px #0f0, 0 0 2px #0f0;
+            letter-spacing: 4px;
+            animation: flicker 3s infinite;
+            word-break: break-word;
         }
-
-        .quiz-header p {
-            color: #9ca3cf;
-            margin-top: 0.5rem;
-            font-size: 0.95rem;
-        }
-
         .stats-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: #0f1320;
+            background: #041004;
             padding: 0.8rem 2rem;
-            border-bottom: 1px solid #252b3d;
-            font-size: 0.9rem;
+            border-bottom: 1px solid #2a8a2a;
+            font-weight: bold;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
-
-        .score-area {
-            background: #1e2a3a;
+        .score-area, .progress-text {
+            background: #0a1a0a;
+            border: 1px solid #3eff6e;
             padding: 0.3rem 1rem;
-            border-radius: 60px;
-            font-weight: 600;
-            color: #b9e0ff;
-        }
-
-        .progress-text {
-            font-family: monospace;
-            background: #00000030;
-            padding: 0.2rem 0.8rem;
             border-radius: 30px;
+            font-family: monospace;
+            box-shadow: 0 0 5px #0f0;
         }
-
         button {
-            background: #2c3e66;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.6rem 1.6rem;
+            background: #0a200a;
+            border: 2px solid #0f0;
+            color: #b3ffb3;
+            font-weight: bold;
+            padding: 0.5rem 1.4rem;
             border-radius: 40px;
-            font-size: 0.9rem;
+            font-family: monospace;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 0 5px #0f0;
         }
-
         button:hover {
-            background: #3e5a85;
-            transform: scale(0.97);
+            background: #1f5f1f;
+            transform: scale(0.96);
+            box-shadow: 0 0 15px #0f0;
+            color: white;
         }
-
-        .submit-btn {
-            background: #4f46e5;
-            margin-right: 1rem;
-        }
-
-        .submit-btn:hover {
-            background: #6366f1;
-        }
-
-        .reset-btn {
-            background: #334155;
-        }
-
         .quiz-questions {
-            padding: 1.5rem 2rem 2rem 2rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.8rem;
         }
-
         .question-card {
-            background: #0f1422e6;
-            border-radius: 1.5rem;
-            padding: 1.3rem 1.5rem;
-            border-left: 5px solid #3b82f6;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: #0b130be6;
+            border-left: 6px solid #2aff5e;
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            transition: 0.1s;
+            box-shadow: 0 0 6px rgba(0,255,0,0.2);
         }
-
         .question-card.correct-highlight {
-            background: #0f261f;
-            border-left-color: #2dd4bf;
+            background: #0a2a0a;
+            border-left-color: #aaffaa;
+            box-shadow: 0 0 14px #2eff7a;
         }
-
         .question-card.incorrect-highlight {
-            background: #2a1a24;
-            border-left-color: #f97316;
+            background: #2a1a12;
+            border-left-color: #ffaa66;
+            box-shadow: 0 0 8px #ff884d;
         }
-
         .question-text {
-            font-weight: 600;
-            font-size: 1.05rem;
+            font-weight: bold;
+            font-size: 1rem;
             margin-bottom: 1rem;
-            padding-right: 0.5rem;
-            color: #f0f3ff;
+            color: #d0ffd0;
         }
-
         .options {
             display: flex;
             flex-direction: column;
-            gap: 0.7rem;
+            gap: 0.6rem;
             margin-left: 0.5rem;
         }
-
         .option {
             display: flex;
             align-items: baseline;
             gap: 0.8rem;
-            flex-wrap: wrap;
             cursor: pointer;
-            padding: 0.4rem 0.6rem;
-            border-radius: 14px;
-            transition: background 0.1s;
+            padding: 0.3rem 0.5rem;
+            border-radius: 12px;
         }
-
         .option:hover {
-            background: #1e263b;
+            background: #1d2a1d;
+            transform: translateX(6px);
         }
-
         input[type="radio"] {
-            accent-color: #3b82f6;
+            accent-color: #0f0;
             width: 1rem;
             height: 1rem;
-            margin-top: 0.2rem;
         }
-
         .option-label {
-            font-size: 0.95rem;
-            color: #cbd5f0;
-            line-height: 1.4;
+            font-size: 0.92rem;
+            color: #bfffbf;
         }
-
-        .feedback-icon {
-            margin-left: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 500;
+        .badge-tf {
+            background: #1a3a1a;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin-left: 8px;
+            border: 0.5px solid #5eff5e;
         }
-
+        .submit-end-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 2rem 0;
+        }
+        .submit-end-btn {
+            background: #0f3a0f;
+            font-size: 1.2rem;
+            padding: 0.8rem 2.5rem;
+            border-radius: 60px;
+            letter-spacing: 2px;
+            animation: pulse-glow 1.5s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 #0f0; }
+            70% { box-shadow: 0 0 0 12px rgba(0,255,0,0); }
+            100% { box-shadow: 0 0 0 0 #0f0; }
+        }
         .result-area {
-            margin-top: 1rem;
-            text-align: center;
-            background: #05070f;
+            background: #031003e0;
+            margin: 0 2rem 2rem 2rem;
             padding: 1.2rem;
-            border-radius: 2rem;
-            margin-bottom: 1rem;
+            border-radius: 1.5rem;
+            border: 1px solid #3eff6e;
         }
-
+        .mistake-list {
+            background: #0a120a;
+            border-radius: 1rem;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px dashed #88ff88;
+        }
+        .mistake-item {
+            font-size: 0.8rem;
+            border-bottom: 1px solid #2a5e2a;
+            padding: 0.5rem;
+            color: #ffffaa;
+        }
         footer {
             text-align: center;
-            padding: 1.2rem;
-            font-size: 0.8rem;
-            color: #5f6c97;
-            border-top: 1px solid #20273d;
-        }
-
-        .badge-tf {
-            background: #2d3748;
+            padding: 1rem;
             font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            margin-left: 12px;
-            vertical-align: middle;
-        }
-
-        @media (max-width: 700px) {
-            .quiz-questions {
-                padding: 1rem;
-            }
-            .question-card {
-                padding: 1rem;
-            }
-            .stats-bar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            border-top: 1px solid #2a5e2a;
         }
     </style>
 </head>
 <body>
-<div class="quiz-container">
+<canvas id="matrix-canvas"></canvas>
+<div class="scan-overlay"></div>
+
+<div class="quiz-wrapper">
     <div class="quiz-header">
-        <h1>🧠 Virtual Reality Mastery <span style="font-size:1rem;">(118 questions)</span></h1>
-        <p>86 MCQs + 32 True/False — from fundamentals, hardware, UX, ethics, and future trends</p>
+        <h1>⎯⎯[ VR by Abdelrazik Badr ]⎯⎯</h1>
+        <p style="margin-top: 8px;">>_ 118 encrypted challenges | terminal mode active_</p>
     </div>
     <div class="stats-bar">
-        <div class="progress-text">📋 Answered: <span id="totalCounter">0</span> / 118</div>
-        <div class="score-area">🏆 Score: <span id="scoreDisplay">0</span> / 118</div>
-        <div style="display: flex; gap: 12px;">
-            <button class="submit-btn" id="submitQuiz">✅ Submit & Grade</button>
-            <button class="reset-btn" id="resetQuiz">⟳ Reset Answers</button>
-        </div>
+        <div class="progress-text">◉ PAYLOAD: <span id="totalCounter">0</span>/118</div>
+        <div class="score-area">⛁ SCORE: <span id="scoreDisplay">0</span></div>
+        <div><button id="resetQuiz" class="reset-btn">⟳ RESET MATRIX</button></div>
     </div>
+
     <div id="questionsContainer" class="quiz-questions"></div>
+
+    <!-- SUBMIT BUTTON AT THE END -->
+    <div class="submit-end-container">
+        <button id="submitQuizEnd" class="submit-end-btn">⚡ Submit Answers ⚡</button>
+    </div>
+
     <div id="resultMessage" class="result-area" style="display: none;"></div>
-    <footer>VR / XR comprehensive exam — each question has one correct answer. Good luck!</footer>
+    <footer>>_ use the matrix. unanswered = system failure. submit when ready.</footer>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // PART 1: 86 MCQs (from original VR file)
+    // MATRIX DIGITAL RAIN ANIMATION
+    // --------------------------------------------------------------
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789";
+    const fontSize = 16;
+    let columns = canvas.width / fontSize;
+    let drops = [];
+    for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0f0';
+        ctx.font = `bold ${fontSize}px monospace`;
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 45);
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        columns = canvas.width / fontSize;
+        drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+    });
+
+    // attack flash effect
+    function attackFlash(isHighScore) {
+        const flashDiv = document.createElement('div');
+        flashDiv.style.position = 'fixed';
+        flashDiv.style.top = 0;
+        flashDiv.style.left = 0;
+        flashDiv.style.width = '100%';
+        flashDiv.style.height = '100%';
+        flashDiv.style.backgroundColor = isHighScore ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 80, 40, 0.3)';
+        flashDiv.style.pointerEvents = 'none';
+        flashDiv.style.zIndex = 9999;
+        flashDiv.style.animation = 'attackFlash 0.4s ease-out';
+        document.body.appendChild(flashDiv);
+        setTimeout(() => flashDiv.remove(), 400);
+        // small beep-like simulation (Web Audio)
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            oscillator.connect(gain);
+            gain.connect(audioCtx.destination);
+            oscillator.frequency.value = isHighScore ? 880 : 440;
+            gain.gain.value = 0.1;
+            oscillator.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch(e) { /* no audio */ }
+    }
+
+    // --------------------------------------------------------------
+    // ALL 118 QUESTIONS (MCQ 86 + T/F 32) - same verified content
     // --------------------------------------------------------------
     const MCQS = [
         { text: "Virtual Reality creates environments that are:", options: ["Only text-based", "Immersive and computer-generated", "Physical models", "Purely audio-based"], correct: "b" },
@@ -336,9 +427,6 @@
         { text: "The future trend in VR that involves using remote servers to process VR experiences and stream them to headsets is called ______ VR.", options: ["Standalone", "Tethered", "Cloud", "Edge"], correct: "c" }
     ];
 
-    // --------------------------------------------------------------
-    // PART 2: 32 True / False Questions (from the provided PDF)
-    // --------------------------------------------------------------
     const TRUE_FALSE = [
         { text: "Decreasing draw calls is a recommended performance tip for VR development.", options: ["True", "False"], correct: "a" },
         { text: "Effective optimization can improve performance from 5 FPS to 90 FPS.", options: ["True", "False"], correct: "a" },
@@ -374,12 +462,14 @@
         { text: "VR technology is currently evolving beyond gaming into enterprise applications across various industries.", options: ["True", "False"], correct: "a" }
     ];
 
-    // Combine all questions: MCQs first, then True/False
     const ALL_QUESTIONS = [...MCQS, ...TRUE_FALSE];
-    const TOTAL_QS = ALL_QUESTIONS.length;  // = 118
-
+    const TOTAL_QS = ALL_QUESTIONS.length;
     let userAnswers = new Array(TOTAL_QS).fill(null);
     let quizSubmitted = false;
+
+    function getOptionLetters(q) {
+        return ['a', 'b', 'c', 'd'].slice(0, q.options.length);
+    }
 
     function renderQuestions() {
         const container = document.getElementById('questionsContainer');
@@ -388,19 +478,14 @@
             const qNumber = idx + 1;
             const card = document.createElement('div');
             card.className = 'question-card';
-            card.setAttribute('data-qid', idx);
-            
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
-            let typeBadge = '';
-            if (idx >= MCQS.length) typeBadge = '<span class="badge-tf">True/False</span>';
-            questionText.innerHTML = `<span style="background:#2d3a5e; padding:2px 12px; border-radius:40px; margin-right:12px;">${qNumber}</span> ${q.text} ${typeBadge}`;
+            let typeBadge = (idx >= MCQS.length) ? '<span class="badge-tf">[T/F]</span>' : '';
+            questionText.innerHTML = `<span style="background:#1a3a1a; padding:2px 10px; border-radius:30px; margin-right:12px;">${qNumber}</span> ${q.text} ${typeBadge}`;
             card.appendChild(questionText);
-
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'options';
-            const letters = ['a', 'b', 'c', 'd'];
-            // for T/F only first two matter but we use options array
+            const letters = getOptionLetters(q);
             q.options.forEach((opt, optIdx) => {
                 const letter = letters[optIdx];
                 const optionWrapper = document.createElement('label');
@@ -416,7 +501,7 @@
                         updateStats();
                     } else {
                         e.target.checked = false;
-                        alert("Quiz already submitted. Press 'Reset Answers' to try again.");
+                        alert(">_ SYSTEM LOCKED: Reset matrix to re-engage.");
                     }
                 });
                 const spanLabel = document.createElement('span');
@@ -427,22 +512,22 @@
                 optionsDiv.appendChild(optionWrapper);
             });
             card.appendChild(optionsDiv);
-
-            if (quizSubmitted && userAnswers[idx]) {
-                const isCorrect = (userAnswers[idx] === q.correct);
+            if (quizSubmitted) {
+                const userChoice = userAnswers[idx];
+                const isCorrect = (userChoice && userChoice === q.correct);
                 if (isCorrect) card.classList.add('correct-highlight');
                 else card.classList.add('incorrect-highlight');
                 const feedbackSpan = document.createElement('div');
-                feedbackSpan.style.fontSize = '0.8rem';
-                feedbackSpan.style.marginTop = '0.6rem';
-                feedbackSpan.style.fontWeight = '500';
+                feedbackSpan.style.fontSize = '0.75rem';
+                feedbackSpan.style.marginTop = '0.5rem';
                 if (isCorrect) {
-                    feedbackSpan.innerHTML = '✅ Correct';
-                    feedbackSpan.style.color = '#86efac';
+                    feedbackSpan.innerHTML = '✓ ACCESS GRANTED';
+                    feedbackSpan.style.color = '#aaffaa';
                 } else {
                     let correctAnswerText = q.options[letters.indexOf(q.correct)];
-                    feedbackSpan.innerHTML = `❌ Incorrect. Correct answer: ${q.correct.toUpperCase()}) ${correctAnswerText}`;
-                    feedbackSpan.style.color = '#fbbf24';
+                    let userAnswerText = userChoice ? q.options[letters.indexOf(userChoice)] : '∅ VOID';
+                    feedbackSpan.innerHTML = `✗ FAIL | input: ${userAnswerText} | required: ${correctAnswerText}`;
+                    feedbackSpan.style.color = '#ffbb99';
                 }
                 card.appendChild(feedbackSpan);
             }
@@ -456,38 +541,76 @@
         if (!quizSubmitted) {
             document.getElementById('scoreDisplay').innerText = '?';
         } else {
-            let correctCount = 0;
-            for (let i = 0; i < TOTAL_QS; i++) {
-                if (userAnswers[i] && userAnswers[i] === ALL_QUESTIONS[i].correct) correctCount++;
-            }
-            document.getElementById('scoreDisplay').innerText = `${correctCount}`;
+            document.getElementById('scoreDisplay').innerText = computeCorrectCount();
         }
+    }
+
+    function computeCorrectCount() {
+        let correct = 0;
+        for (let i=0; i<TOTAL_QS; i++) {
+            if (userAnswers[i] && userAnswers[i] === ALL_QUESTIONS[i].correct) correct++;
+        }
+        return correct;
+    }
+
+    function buildMistakeReport() {
+        const mistakes = [];
+        for (let i=0; i<TOTAL_QS; i++) {
+            const userChoice = userAnswers[i];
+            const isCorrect = (userChoice && userChoice === ALL_QUESTIONS[i].correct);
+            if (!isCorrect) {
+                const letters = getOptionLetters(ALL_QUESTIONS[i]);
+                const correctAns = ALL_QUESTIONS[i].options[letters.indexOf(ALL_QUESTIONS[i].correct)];
+                const userAnsText = userChoice ? ALL_QUESTIONS[i].options[letters.indexOf(userChoice)] : "⛔ NOT ANSWERED";
+                mistakes.push({
+                    num: i+1,
+                    text: ALL_QUESTIONS[i].text.length > 85 ? ALL_QUESTIONS[i].text.substring(0,82)+'...' : ALL_QUESTIONS[i].text,
+                    userAnswer: userAnsText,
+                    correctAnswer: correctAns
+                });
+            }
+        }
+        return mistakes;
     }
 
     function computeScoreAndShow() {
         if (quizSubmitted) {
-            alert("Quiz already graded! Press 'Reset Answers' to take the quiz again.");
+            alert(">_ ATTACK ALREADY EXECUTED. Use RESET MATRIX.");
             return;
         }
-        let answeredCount = userAnswers.filter(a => a !== null).length;
+        const answeredCount = userAnswers.filter(a => a !== null).length;
         if (answeredCount < TOTAL_QS) {
-            if (!confirm(`You have answered ${answeredCount} out of ${TOTAL_QS} questions. Submit anyway? Unanswered will count as wrong.`)) {
+            if (!confirm(`⚠️ Only ${answeredCount}/${TOTAL_QS} answers detected. Execute anyway? (unanswered = wrong)`)) {
                 return;
             }
         }
-        let correctTotal = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] && userAnswers[i] === ALL_QUESTIONS[i].correct) correctTotal++;
-        }
+        const correctTotal = computeCorrectCount();
         quizSubmitted = true;
-        document.getElementById('scoreDisplay').innerText = `${correctTotal}`;
         const percent = ((correctTotal / TOTAL_QS) * 100).toFixed(1);
+        const mistakes = buildMistakeReport();
+        const isHighScore = percent >= 70;
+        attackFlash(isHighScore);
+        document.getElementById('scoreDisplay').innerText = correctTotal;
         const msgDiv = document.getElementById('resultMessage');
         msgDiv.style.display = 'block';
-        msgDiv.innerHTML = `<strong>🏆 Final Score: ${correctTotal} / ${TOTAL_QS} (${percent}%)</strong><br> 
-        ${percent >= 70 ? '🌟 Excellent VR knowledge! 🌟' : percent >= 50 ? '📚 Good attempt, review the topics for mastery.' : '🎓 Keep studying — virtual reality concepts take practice!'}
-        <br> <span style="font-size:0.85rem;">✅ Green cards = correct &nbsp;&nbsp; 🟠 Orange cards = incorrect (correct answer shown)</span>`;
-        renderQuestions();  // re-render with highlights & correct answers
+        let mistakeHtml = '';
+        if (mistakes.length === 0) {
+            mistakeHtml = '<div style="color:#88ff88; margin-top:1rem;">🔥 PERFECT EXPLOIT — NO FAILED LOGS 🔥</div>';
+        } else {
+            mistakeHtml = `<div class="mistake-list"><h3>▶ BREACH LOGS (${mistakes.length})</h3>`;
+            mistakes.forEach(m => {
+                mistakeHtml += `<div class="mistake-item"><strong>Q${m.num}:</strong> ${m.text}<br> ↳ YOUR PAYLOAD: ${m.userAnswer} &nbsp;|&nbsp; <span style="color:#7eff7e;">REQUIRED: ${m.correctAnswer}</span></div>`;
+            });
+            mistakeHtml += '</div>';
+        }
+        const hackMessage = percent >= 90 ? "💀 SYSTEM FULLY COMPROMISED 💀" :
+                            percent >= 70 ? "⚡ ACCESS GRANTED — ELITE HACKER ⚡" :
+                            percent >= 50 ? "📡 PARTIAL BREACH — IMPROVE SKILLS" :
+                            "❌ ACCESS DENIED — STUDY REQUIRED";
+        msgDiv.innerHTML = `<strong>⛁ FINAL SCORE: ${correctTotal} / ${TOTAL_QS} (${percent}%)</strong><br> 
+        <span style="color:#ffffaa;">${hackMessage}</span>
+        ${mistakeHtml}`;
+        renderQuestions();
         updateStats();
     }
 
@@ -501,11 +624,9 @@
         updateStats();
     }
 
-    // initial render
     renderQuestions();
     updateStats();
-
-    document.getElementById('submitQuiz').addEventListener('click', computeScoreAndShow);
+    document.getElementById('submitQuizEnd').addEventListener('click', computeScoreAndShow);
     document.getElementById('resetQuiz').addEventListener('click', resetQuiz);
 </script>
 </body>
